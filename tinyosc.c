@@ -80,13 +80,15 @@ uint64_t tosc_getTimetag(tosc_bundle *b) {
 
 uint32_t tosc_getBundleLength(tosc_bundle *b) { return b->bundleLen; }
 
-bool tosc_getNextMessage(tosc_bundle *b, tosc_message *o) {
+int tosc_getNextMessage(tosc_bundle *b, tosc_message *o) {
   if ((b->marker - b->buffer) >= b->bundleLen)
-    return false;
+    return 1;
   uint32_t len = (uint32_t)ntohl(*((int32_t *)b->marker));
-  tosc_parseMessage(o, b->marker + 4, len);
+  int ret = tosc_parseMessage(o, b->marker + 4, len);
+  if (ret != 0)
+    return 2;
   b->marker += (4 + len); // move marker to next bundle element
-  return true;
+  return 0;
 }
 
 char *tosc_getAddress(tosc_message *o) { return o->buffer; }

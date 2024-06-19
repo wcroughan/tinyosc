@@ -27,23 +27,23 @@ extern "C" {
 #endif
 
 typedef struct tosc_message {
-  char *format;  // a pointer to the format field
-  char *marker;  // the current read head
-  char *buffer;  // the original message data (also points to the address)
-  uint32_t len;  // length of the buffer data
+  char *format; // a pointer to the format field
+  char *marker; // the current read head
+  char *buffer; // the original message data (also points to the address)
+  uint32_t len; // length of the buffer data
 } tosc_message;
 
 typedef struct tosc_bundle {
-  char *marker; // the current write head (where the next message will be written)
-  char *buffer; // the original buffer
-  uint32_t bufLen; // the byte length of the original buffer
+  char *
+      marker; // the current write head (where the next message will be written)
+  char *buffer;       // the original buffer
+  uint32_t bufLen;    // the byte length of the original buffer
   uint32_t bundleLen; // the byte length of the total bundle
 } tosc_bundle;
 
-
-
 /**
- * Returns true if the buffer refers to a bundle of OSC messages. False otherwise.
+ * Returns true if the buffer refers to a bundle of OSC messages. False
+ * otherwise.
  */
 bool tosc_isBundle(const char *buffer);
 
@@ -58,10 +58,10 @@ void tosc_parseBundle(tosc_bundle *b, char *buffer, const int len);
 uint64_t tosc_getTimetag(tosc_bundle *b);
 
 /**
- * Parses the next message in a bundle. Returns true if successful.
- * False otherwise.
+ * Parses the next message in a bundle. Returns 0 if successful.
+ * Returns 1 if not more messages, returns 2 if there's a parsing error.
  */
-bool tosc_getNextMessage(tosc_bundle *b, tosc_message *o);
+int tosc_getNextMessage(tosc_bundle *b, tosc_message *o);
 
 /**
  * Returns a point to the address block of the OSC buffer.
@@ -140,13 +140,14 @@ int tosc_parseMessage(tosc_message *o, char *buffer, const int len);
 /**
  * Starts writing a bundle to the given buffer with length.
  */
-void tosc_writeBundle(tosc_bundle *b, uint64_t timetag, char *buffer, const int len);
+void tosc_writeBundle(tosc_bundle *b, uint64_t timetag, char *buffer,
+                      const int len);
 
 /**
  * Write a message to a bundle buffer. Returns the number of bytes written.
  */
-uint32_t tosc_writeNextMessage(tosc_bundle *b,
-    const char *address, const char *format, ...);
+uint32_t tosc_writeNextMessage(tosc_bundle *b, const char *address,
+                               const char *format, ...);
 
 /**
  * Returns the length in bytes of the bundle.
@@ -158,7 +159,7 @@ uint32_t tosc_getBundleLength(tosc_bundle *b);
  * The entire buffer is cleared before writing.
  */
 uint32_t tosc_writeMessage(char *buffer, const int len, const char *address,
-    const char *fmt, ...);
+                           const char *fmt, ...);
 
 /**
  * A convenience function to (non-destructively) print a buffer containing
