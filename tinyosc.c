@@ -63,9 +63,7 @@ int tosc_parseMessage(tosc_message *o, char *buffer, const int len) {
 }
 
 // check if first eight bytes are '#bundle '
-bool tosc_isBundle(const char *buffer) {
-  return ((*(const int64_t *)buffer) == htonll(BUNDLE_ID));
-}
+bool tosc_isBundle(const char *buffer) { return ((*(const int64_t *)buffer) == htonll(BUNDLE_ID)); }
 
 void tosc_parseBundle(tosc_bundle *b, char *buffer, const int len) {
   b->buffer = (char *)buffer;
@@ -74,9 +72,7 @@ void tosc_parseBundle(tosc_bundle *b, char *buffer, const int len) {
   b->bundleLen = len;
 }
 
-uint64_t tosc_getTimetag(tosc_bundle *b) {
-  return ntohll(*((uint64_t *)(b->buffer + 8)));
-}
+uint64_t tosc_getTimetag(tosc_bundle *b) { return ntohll(*((uint64_t *)(b->buffer + 8))); }
 
 uint32_t tosc_getBundleLength(tosc_bundle *b) { return b->bundleLen; }
 
@@ -110,9 +106,7 @@ int64_t tosc_getNextInt64(tosc_message *o) {
   return i;
 }
 
-uint64_t tosc_getNextTimetag(tosc_message *o) {
-  return (uint64_t)tosc_getNextInt64(o);
-}
+uint64_t tosc_getNextTimetag(tosc_message *o) { return (uint64_t)tosc_getNextInt64(o); }
 
 float tosc_getNextFloat(tosc_message *o) {
   // convert from big-endian (network btye order)
@@ -160,13 +154,12 @@ tosc_message *tosc_reset(tosc_message *o) {
   int i = 0;
   while (o->format[i] != '\0')
     ++i;
-  i = (i + 5) & ~0x3; // advance to the next multiple of 4 after trailing '\0'
+  i = (i + 5) & ~0x3;            // advance to the next multiple of 4 after trailing '\0'
   o->marker = o->format + i - 1; // -1 to account for ',' format prefix
   return o;
 }
 
-void tosc_writeBundle(tosc_bundle *b, uint64_t timetag, char *buffer,
-                      const int len) {
+void tosc_writeBundle(tosc_bundle *b, uint64_t timetag, char *buffer, const int len) {
   *((uint64_t *)buffer) = htonll(BUNDLE_ID);
   *((uint64_t *)(buffer + 8)) = htonll(timetag);
 
@@ -177,8 +170,7 @@ void tosc_writeBundle(tosc_bundle *b, uint64_t timetag, char *buffer,
 }
 
 // always writes a multiple of 4 bytes
-static uint32_t tosc_vwrite(char *buffer, const int len, const char *address,
-                            const char *format, va_list ap) {
+static uint32_t tosc_vwrite(char *buffer, const int len, const char *address, const char *format, va_list ap) {
   memset(buffer, 0, len); // clear the buffer
   uint32_t i = (uint32_t)strlen(address);
   if (address == NULL || i >= len)
@@ -268,14 +260,12 @@ static uint32_t tosc_vwrite(char *buffer, const int len, const char *address,
   return i; // return the total number of bytes written
 }
 
-uint32_t tosc_writeNextMessage(tosc_bundle *b, const char *address,
-                               const char *format, ...) {
+uint32_t tosc_writeNextMessage(tosc_bundle *b, const char *address, const char *format, ...) {
   va_list ap;
   va_start(ap, format);
   if (b->bundleLen >= b->bufLen)
     return 0;
-  const uint32_t i = tosc_vwrite(b->marker + 4, b->bufLen - b->bundleLen - 4,
-                                 address, format, ap);
+  const uint32_t i = tosc_vwrite(b->marker + 4, b->bufLen - b->bundleLen - 4, address, format, ap);
   va_end(ap);
   *((uint32_t *)b->marker) = htonl(i); // write the length of the message
   b->marker += (4 + i);
@@ -283,8 +273,7 @@ uint32_t tosc_writeNextMessage(tosc_bundle *b, const char *address,
   return i;
 }
 
-uint32_t tosc_writeMessage(char *buffer, const int len, const char *address,
-                           const char *format, ...) {
+uint32_t tosc_writeMessage(char *buffer, const int len, const char *address, const char *format, ...) {
   va_list ap;
   va_start(ap, format);
   const uint32_t i = tosc_vwrite(buffer, len, address, format, ap);
